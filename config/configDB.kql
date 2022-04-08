@@ -20,14 +20,14 @@
 }
 
 .create-or-alter function with (folder = "Analytics/IoT", skipvalidation = "true") GetDevicesbyStore(Office:string) {
-	let ADTendpoint = "https://<dtURI>";
+	let ADTendpoint = "https://digitaltwinpm16393.api.eus.digitaltwins.azure.net";
 	let ADTquery = strcat("SELECT T.$dtId as Office, F.$dtId as Floor, D.$dtId as DeviceId FROM DIGITALTWINS T JOIN F RELATED T.officecontainsfloors JOIN D RELATED F.floorcontainsdevices where T.$dtId='", Office, "'"); 
 	evaluate azure_digital_twins_query_request(ADTendpoint, ADTquery)
     | project Office=tostring(Office), Floor=tostring(Floor), DeviceId=tostring(DeviceId)
 } 
 
 .create-or-alter function with (folder = "Analytics/IoT", skipvalidation = "true") GetDevicesbyStoreFloor(Office:string, Floor:string) {
-	let ADTendpoint = "https://<dtURI>";
+	let ADTendpoint = "https://digitaltwinpm16393.api.eus.digitaltwins.azure.net";
 	let ADTquery = strcat("SELECT T.$dtId as Office, F.$dtId as Floor, D.$dtId as DeviceId FROM DIGITALTWINS T JOIN F RELATED T.officecontainsfloors JOIN D RELATED F.floorcontainsdevices where T.$dtId='", Office, "' AND F.$dtId = '", Floor, "'"); 
 	evaluate azure_digital_twins_query_request(ADTendpoint, ADTquery)
     | project Office=tostring(Office), Floor=tostring(Floor), DeviceId=tostring(DeviceId)

@@ -83,7 +83,7 @@ function configure_ADX_cluster() {
         --account-key $saKey --account-name $saName --only-show-errors --output none  ;\
     blobURI="https://$saName.blob.core.windows.net/adxscript/configDB.kql"  ;\
     blobSAS=$(az storage blob generate-sas --account-name $saName --container-name adxscript \
-        --name configDB.kql --permissions acdrw --expiry $tomorrow --account-key $saKey --output tsv)  ;\
+        --name configDB.kql --permissions acdrw --expiry '$tomorrow' --account-key $saKey --output tsv)  ;\
     az kusto script create --cluster-name $adxName --database-name IoTAnalytics  \
         --force-update-tag "config1" --script-url $blobURI --script-url-sas-token $blobSAS \
         --resource-group $rgName --name 'configDB' --only-show-errors --output none  ;\
@@ -183,7 +183,8 @@ function create_digital_twin_models() {
 function deploy_thermostat_devices() {
     for (( c=1; c<=$numDevices; c++ ))
     do
-        deviceId=$(cat /proc/sys/kernel/random/uuid)
+        # deviceId=$(cat /proc/sys/kernel/random/uuid)
+        deviceId=`uuidgen`
         az iot central device create --device-id $deviceId --app-id $iotCentralAppID \
             --template dtmi:m43gbjjsrr5:fp1yz0dm0qs --simulated --only-show-errors --output none
 
@@ -211,14 +212,15 @@ function configure_IoT_Central_output() {
 # Define required variables
 randomNum=$RANDOM
 currentDate=$(date)
-tomorrow=$(date +"%Y-%m-%dT00:00:00Z" -d "$currentDate +1 days")
+# tomorrow=$(date +"%Y-%m-%dT00:00:00Z" -d "$currentDate +1 days")
+tomorrow=$(date -v+1d)
 deploymentName=ADXIoTAnalyticsDeployment$randomNum
 rgName=ADXIoTAnalytics$randomNum
 principalId=$(az ad signed-in-user show --query objectId -o tsv)
 
 # Setup array to utilize when assiging devices to departments and patients
 floors=('DAL1' 'DAL2' 'DAL3' 'DAL4' 'DAL5' 'DAL6' 'SEA1' 'SEA2' 'SEA3' 'SEA4' 'SEA5' 'SEA6' 'ATL1' 'ATL2' 'ATL3' 'ATL4' 'ATL5' 'ATL6')
-
+# echo ${floors[0]}
 banner # Show Welcome banner
 
 echo '1. Starting solution deployment'
